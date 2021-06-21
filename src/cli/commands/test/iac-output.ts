@@ -127,10 +127,12 @@ export function createSarifOutputForIac(
 ): sarif.Log {
   const issues = iacTestResponses.reduce((collect: ResponseIssues, res) => {
     if (res.result) {
-      // FIXME: For single file tests the targetFile includes the full file
-      // path, for directory tests only the filename is returned and we need
-      // too build the path manually.
-      const targetPath = res.targetFile.startsWith(res.path)
+      // The path is provided by the user or resolved to the current working directory (absolute path)
+      // The targetFile is relative to the provided path
+      // The current working directory is used as the PROJECTROOT, rather than the provided path
+      // The targetPath used for the physicalLocation MUST be relative to the PROJECTROOT
+      // So in case we're provided a relative path by the user, we want to use that to compute the targetPath
+      const targetPath = pathLib.isAbsolute(res.path)
         ? pathLib.join(res.targetFile)
         : pathLib.join(res.path, res.targetFile);
       const mapped = res.result.cloudConfigResults.map((issue) => ({
