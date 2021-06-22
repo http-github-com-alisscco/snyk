@@ -134,34 +134,37 @@ describe('iac test --sarif-file-output', () => {
 
   [
     {
-      location: './iac/file-output/sg_open_ssh.tf', // single file
+      location: 'iac/file-output/sg_open_ssh.tf', // single file
       expectedPhysicalLocation: path.join('iac/file-output/sg_open_ssh.tf'),
       expectedProjectRoot:
         'file://' + path.join(path.resolve('./test/fixtures/'), '/'),
     },
     {
       location: './iac/file-output/nested-folder', // folder with a single file
-      expectedPhysicalLocation: path.join(
-        'iac/file-output/nested-folder/sg_open_ssh.tf',
-      ),
+      expectedPhysicalLocation: path.join('sg_open_ssh.tf'),
       expectedProjectRoot:
-        'file://' + path.join(path.resolve('./test/fixtures/'), '/'),
+        'file://' +
+        path.join(
+          path.resolve('./test/fixtures/iac/file-output/nested-folder/'),
+          '/',
+        ),
     },
     {
       location: './iac/file-output', // folder with a nested folder
-      expectedPhysicalLocation: path.join(
-        'iac/file-output/nested-folder/sg_open_ssh.tf',
-      ),
+      expectedPhysicalLocation: path.join('nested-folder/sg_open_ssh.tf'),
       expectedProjectRoot:
-        'file://' + path.join(path.resolve('./test/fixtures/'), '/'),
+        'file://' +
+        path.join(path.resolve('./test/fixtures/iac/file-output/'), '/'),
     },
     {
       location: '../fixtures/iac/file-output/nested-folder', // folder nested outside running directory
-      expectedPhysicalLocation: path.join(
-        '../fixtures/iac/file-output/nested-folder/sg_open_ssh.tf',
-      ),
+      expectedPhysicalLocation: path.join('sg_open_ssh.tf'),
       expectedProjectRoot:
-        'file://' + path.join(path.resolve('./test/fixtures/'), '/'),
+        'file://' +
+        path.join(
+          path.resolve('./test/fixtures/iac/file-output/nested-folder/'),
+          '/',
+        ),
     },
   ].forEach(({ location, expectedPhysicalLocation, expectedProjectRoot }) => {
     it(`returns the correct paths for provided path ${location}`, async () => {
@@ -176,11 +179,11 @@ describe('iac test --sarif-file-output', () => {
       const jsonObj = JSON.parse(outputFileContents);
       const actualProjectRoot =
         jsonObj?.runs?.[0].originalUriBaseIds.PROJECTROOT.uri;
-      const actualPhyisicalLocation =
+      const actualPhysicalLocation =
         jsonObj?.runs?.[0].results[0].locations[0].physicalLocation
           .artifactLocation.uri;
       expect(actualProjectRoot).toEqual(expectedProjectRoot);
-      expect(actualPhyisicalLocation).toEqual(expectedPhysicalLocation);
+      expect(actualPhysicalLocation).toEqual(expectedPhysicalLocation);
     });
   });
 });
